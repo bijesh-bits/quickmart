@@ -1,0 +1,16 @@
+<div class="navbar-container">
+  <p-menubar [model]="menuItems">
+    <ng-template pTemplate="start">
+      <div class="brand-section flex align-items-center cursor-pointer" routerLink="/dashboard">
+        <i class="pi pi-shopping-bag"></i>
+        <span class="brand-text">QuickMart</span>
+      </div>
+    </ng-template>
+    
+    <ng-template pTemplate="end">
+      <div class="flex align-items-center gap-2">
+        <!-- Cart badge removed from here, moved to menu item -->
+      </div>
+    </ng-template>
+  </p-menubar>
+</div>

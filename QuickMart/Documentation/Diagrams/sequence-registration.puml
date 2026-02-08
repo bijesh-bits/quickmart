@@ -1,0 +1,61 @@
+@startuml QuickMart_Sequence_UserRegistration
+
+actor User
+participant "Register Component" as RegisterComp
+participant "Auth Service" as AuthService
+participant "Auth Controller" as AuthController
+participant "User Service" as UserService
+participant "User Repository" as UserRepo
+database "SQLite DB" as DB
+
+User -> RegisterComp : Fill registration form\n(email, password, name, phone)
+activate RegisterComp
+
+RegisterComp -> RegisterComp : Validate input\n(client-side)
+
+RegisterComp -> AuthService : register(registerDto)
+activate AuthService
+
+AuthService -> AuthController : POST /api/auth/register
+activate AuthController
+
+AuthController -> AuthController : Validate request\n(ModelState)
+
+AuthController -> UserService : RegisterUserAsync(registerDto)
+activate UserService
+
+UserService -> UserService : Validate business rules\n(email uniqueness, password strength)
+
+UserService -> UserService : Hash password\n(BCrypt)
+
+UserService -> UserRepo : GetByEmailAsync(email)
+activate UserRepo
+UserRepo -> DB : SELECT * FROM Users\nWHERE Email = ?
+DB --> UserRepo : null (not exists)
+deactivate UserRepo
+
+UserService -> UserRepo : CreateAsync(user)
+activate UserRepo
+UserRepo -> DB : INSERT INTO Users\n(Email, PasswordHash, FirstName...)
+DB --> UserRepo : User created
+deactivate UserRepo
+
+UserService -> UserService : Generate JWT token
+
+UserService --> AuthController : AuthResponseDto\n(token, user info)
+deactivate UserService
+
+AuthController --> AuthService : 200 OK\n{token, user}
+deactivate AuthController
+
+AuthService -> AuthService : Store token\n(localStorage)
+
+AuthService --> RegisterComp : Success
+deactivate AuthService
+
+RegisterComp -> RegisterComp : Navigate to\nDashboard
+
+RegisterComp --> User : Registration successful\nRedirect to dashboard
+deactivate RegisterComp
+
+@enduml

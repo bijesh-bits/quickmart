@@ -1,0 +1,88 @@
+<div class="auth-page-wrapper">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="brand-logo">
+          <i class="pi pi-shopping-bag"></i>
+        </div>
+        <h1 class="brand-title">QuickMart</h1>
+        <p class="brand-subtitle">Welcome back! Sign in to continue shopping</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <div class="form-field">
+          <label for="email" class="field-label">
+            <i class="pi pi-envelope mr-2"></i>Email Address
+          </label>
+          <input 
+            id="email" 
+            type="email" 
+            pInputText 
+            formControlName="email"
+            class="w-full p-inputtext-lg"
+            [class.ng-invalid]="f['email'].invalid && f['email'].touched"
+            [class.ng-dirty]="f['email'].touched"
+            placeholder="your@email.com" />
+          <small 
+            *ngIf="f['email'].invalid && f['email'].touched" 
+            class="error-message">
+            <i class="pi pi-exclamation-circle mr-1"></i>
+            <span *ngIf="f['email'].errors?.['required']">Email is required</span>
+            <span *ngIf="f['email'].errors?.['email']">Please enter a valid email</span>
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="password" class="field-label">
+            <i class="pi pi-lock mr-2"></i>Password
+          </label>
+          <p-password 
+            id="password" 
+            formControlName="password"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full p-inputtext-lg"
+            [class.ng-invalid]="f['password'].invalid && f['password'].touched"
+            [class.ng-dirty]="f['password'].touched"
+            placeholder="Enter your password">
+          </p-password>
+          <small 
+            *ngIf="f['password'].invalid && f['password'].touched" 
+            class="error-message">
+            <i class="pi pi-exclamation-circle mr-1"></i>
+            <span *ngIf="f['password'].errors?.['required']">Password is required</span>
+            <span *ngIf="f['password'].errors?.['minlength']">Password must be at least 6 characters</span>
+          </small>
+        </div>
+
+        <p-button 
+          type="submit"
+          label="Sign In" 
+          icon="pi pi-sign-in"
+          [loading]="loading"
+          styleClass="w-full p-button-lg submit-button">
+        </p-button>
+
+        <div class="auth-footer">
+          <div class="divider">
+            <span>or</span>
+          </div>
+          
+          <div class="link-section">
+            <span class="text-muted">Don't have an account?</span>
+            <a routerLink="/register" class="auth-link">
+              <i class="pi pi-user-plus mr-1"></i>Create Account
+            </a>
+          </div>
+
+          <div class="test-credentials">
+            <p-tag severity="info" icon="pi pi-info-circle">
+              <span class="ml-2">Test: test&#64;quickmart.com / Test&#64;123</span>
+            </p-tag>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

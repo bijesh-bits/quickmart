@@ -1,0 +1,299 @@
+<div class="dashboard-container">
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <h1>Welcome to QuickMart</h1>
+      <p>Your one-stop online grocery store</p>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="filters-section">
+      <div class="search-box">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input 
+            type="text" 
+            pInputText 
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()"
+            placeholder="Search for products..." 
+            class="search-input" />
+        </span>
+      </div>
+      
+      <div class="category-filter">
+        <p-dropdown 
+          [options]="categories" 
+          [(ngModel)]="selectedCategory"
+          (onChange)="onCategoryChange()"
+          optionLabel="categoryName"
+          placeholder="All Categories"
+          [showClear]="true"
+          styleClass="category-dropdown">
+        </p-dropdown>
+      </div>
+
+      <div class="layout-buttons">
+        <p-button 
+          icon="pi pi-th-large" 
+          (onClick)="layout = 'grid'"
+          [outlined]="layout !== 'grid'"
+          [text]="layout === 'list'"
+          styleClass="p-button-sm">
+        </p-button>
+        <p-button 
+          icon="pi pi-list" 
+          (onClick)="layout = 'list'"
+          [outlined]="layout !== 'list'"
+          [text]="layout === 'grid'"
+          styleClass="p-button-sm">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-header">
+      <h2>{{ selectedCategory ? selectedCategory.categoryName : 'All Products' }}</h2>
+      <p *ngIf="products.length > 0">{{ products.length }} products found</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <p-progressSpinner></p-progressSpinner>
+      <p>Loading products...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && products.length === 0" class="empty-state">
+      <i class="pi pi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+      <h3>No products found</h3>
+      <p>Try adjusting your search or filter criteria</p>
+    </div>
+
+    <!-- Products Grid View -->
+    <div *ngIf="!loading && products.length > 0 && layout === 'grid'" class="products-grid">
+      <div *ngFor="let product of products" class="product-card">
+        <div class="product-image-container" (click)="viewProduct(product)">
+          <img 
+            [src]="product.imageUrl || 'https://via.placeholder.com/300x200?text=' + product.productName" 
+            [alt]="product.productName"
+            class="product-image">
+          
+          <span *ngIf="product.isFeatured" class="badge badge-featured">
+            <i class="pi pi-star-fill"></i> Featured
+          </span>
+          
+          <span *ngIf="getDiscountPercentage(product) > 0" class="badge badge-discount">
+            {{ getDiscountPercentage(product) }}% OFF
+          </span>
+        </div>
+        
+        <div class="product-info">
+          <div class="product-category">{{ product.categoryName }}</div>
+          <h3 class="product-name" (click)="viewProduct(product)">{{ product.productName }}</h3>
+          <p class="product-description">{{ product.description | slice:0:100 }}{{ product.description.length > 100 ? '...' : '' }}</p>
+          
+          <div class="product-footer">
+            <div class="price-section">
+              <span class="current-price">₹{{ product.discountPrice || product.price }}</span>
+              <span *ngIf="product.discountPrice" class="original-price">₹{{ product.price }}</span>
+            </div>
+            
+            <div class="product-actions">
+              <p-button 
+                label="Add to Cart" 
+                icon="pi pi-shopping-cart"
+                (onClick)="addToCart(product)"
+                [disabled]="product.stockQuantity === 0"
+                styleClass="p-button-sm">
+              </p-button>
+            </div>
+          </div>
+          
+          <div class="stock-status">
+            <span *ngIf="product.stockQuantity > 20" class="in-stock">
+              <i class="pi pi-check-circle"></i> In Stock
+            </span>
+            <span *ngIf="product.stockQuantity > 0 && product.stockQuantity <= 20" class="low-stock">
+              <i class="pi pi-exclamation-triangle"></i> Only {{ product.stockQuantity }} left
+            </span>
+            <span *ngIf="product.stockQuantity === 0" class="out-of-stock">
+              <i class="pi pi-times-circle"></i> Out of Stock
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products List View -->
+    <div *ngIf="!loading && products.length > 0 && layout === 'list'" class="products-list">
+      <div *ngFor="let product of products" class="product-list-item">
+        <img 
+          [src]="product.imageUrl || 'https://via.placeholder.com/150?text=' + product.productName" 
+          [alt]="product.productName"
+          class="product-list-image"
+          (click)="viewProduct(product)">
+        
+        <div class="product-list-info">
+          <div class="product-category">{{ product.categoryName }}</div>
+          <h3 class="product-name" (click)="viewProduct(product)">{{ product.productName }}</h3>
+          <p class="product-description">{{ product.description }}</p>
+          
+          <div class="badges">
+            <span *ngIf="product.isFeatured" class="badge badge-featured">
+              <i class="pi pi-star-fill"></i> Featured
+            </span>
+            <span *ngIf="getDiscountPercentage(product) > 0" class="badge badge-discount">
+              {{ getDiscountPercentage(product) }}% OFF
+            </span>
+          </div>
+        </div>
+        
+        <div class="product-list-actions">
+          <div class="price-section">
+            <span class="current-price">₹{{ product.discountPrice || product.price }}</span>
+            <span *ngIf="product.discountPrice" class="original-price">₹{{ product.price }}</span>
+          </div>
+          
+          <div class="stock-status">
+            <span *ngIf="product.stockQuantity > 20" class="in-stock">
+              <i class="pi pi-check-circle"></i> In Stock
+            </span>
+            <span *ngIf="product.stockQuantity > 0 && product.stockQuantity <= 20" class="low-stock">
+              <i class="pi pi-exclamation-triangle"></i> Only {{ product.stockQuantity }} left
+            </span>
+            <span *ngIf="product.stockQuantity === 0" class="out-of-stock">
+              <i class="pi pi-times-circle"></i> Out of Stock
+            </span>
+          </div>
+          
+          <p-button 
+            label="Add to Cart" 
+            icon="pi pi-shopping-cart"
+            (onClick)="addToCart(product)"
+            [disabled]="product.stockQuantity === 0">
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-toast></p-toast>
+              </div>
+              
+              <div class="text-500 text-sm mb-2">{{ product.unit }}</div>
+              
+              <div class="flex align-items-center justify-content-between mb-3">
+                <div>
+                  <span class="price text-2xl font-bold text-900">
+                    ₹{{ product.discountPrice || product.price }}
+                  </span>
+                  <span *ngIf="product.discountPrice" class="original-price text-sm ml-2">
+                    ₹{{ product.price }}
+                  </span>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <p-tag 
+                  *ngIf="product.stockQuantity > 0" 
+                  value="In Stock" 
+                  [severity]="product.stockQuantity > 10 ? 'success' : 'warning'">
+                </p-tag>
+                <p-tag 
+                  *ngIf="product.stockQuantity === 0" 
+                  value="Out of Stock" 
+                  severity="danger">
+                </p-tag>
+              </div>
+              
+              <p-button 
+                label="Add to Cart" 
+                icon="pi pi-shopping-cart"
+                (onClick)="addToCart(product, $event)"
+                [disabled]="product.stockQuantity === 0"
+                styleClass="w-full">
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template let-product pTemplate="listItem">
+        <div class="col-12 p-2">
+          <div class="surface-card shadow-2 border-round p-3 cursor-pointer hover:shadow-4 transition-duration-300"
+               (click)="viewProduct(product)">
+            <div class="flex flex-column md:flex-row align-items-center gap-3">
+              <img 
+                [src]="product.imageUrl || 'assets/placeholder-product.jpg'" 
+                [alt]="product.productName"
+                class="border-round"
+                style="width: 150px; height: 150px; object-fit: cover;">
+              
+              <div class="flex-1">
+                <div class="flex align-items-start justify-content-between mb-2">
+                  <div>
+                    <div class="text-500 text-sm mb-1">{{ product.categoryName }}</div>
+                    <div class="text-900 font-bold text-xl mb-1">{{ product.productName }}</div>
+                    <div class="text-600 text-sm">{{ product.unit }}</div>
+                  </div>
+                  
+                  <div class="flex gap-2">
+                    <p-tag *ngIf="product.isFeatured" value="Featured" severity="warning"></p-tag>
+                    <p-tag 
+                      *ngIf="getDiscountPercentage(product) > 0" 
+                      [value]="getDiscountPercentage(product) + '% OFF'" 
+                      severity="success">
+                    </p-tag>
+                  </div>
+                </div>
+                
+                <p class="text-600 line-height-3 mb-3">{{ product.description || 'Quality product from ' + product.brand }}</p>
+                
+                <div class="flex align-items-center justify-content-between">
+                  <div class="flex align-items-center gap-3">
+                    <div>
+                      <span class="price text-2xl font-bold text-900">
+                        ₹{{ product.discountPrice || product.price }}
+                      </span>
+                      <span *ngIf="product.discountPrice" class="original-price text-sm ml-2">
+                        ₹{{ product.price }}
+                      </span>
+                    </div>
+                    
+                    <p-tag 
+                      *ngIf="product.stockQuantity > 0" 
+                      value="In Stock" 
+                      [severity]="product.stockQuantity > 10 ? 'success' : 'warning'">
+                    </p-tag>
+                    <p-tag 
+                      *ngIf="product.stockQuantity === 0" 
+                      value="Out of Stock" 
+                      severity="danger">
+                    </p-tag>
+                  </div>
+                  
+                  <p-button 
+                    label="Add to Cart" 
+                    icon="pi pi-shopping-cart"
+                    (onClick)="addToCart(product, $event)"
+                    [disabled]="product.stockQuantity === 0">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="empty">
+        <div class="text-center py-6">
+          <i class="pi pi-inbox text-6xl text-400 mb-3"></i>
+          <p class="text-600 text-xl">No products found</p>
+          <p class="text-500">Try adjusting your search or filter criteria</p>
+        </div>
+      </ng-template>
+    </p-dataView>
+  </div>
+</div>

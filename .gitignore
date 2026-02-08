@@ -1,0 +1,42 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# VS Code
+.vscode/
+
+# Angular
+dist/
+.angular/
+coverage/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+appsettings.Development.json
+*.db
+
+# Environment
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project-specific (requested)
+implementation_guide/
+project_summery/
+
+# Optional: ignore local build artifacts
+*.log
+
+# End of file

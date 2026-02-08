@@ -1,0 +1,229 @@
+@startuml QuickMart_Logical_Architecture
+!define RECTANGLE class
+
+skinparam packageStyle rectangle
+skinparam component {
+    BackgroundColor<<presentation>> LightBlue
+    BackgroundColor<<business>> LightGreen
+    BackgroundColor<<data>> LightYellow
+    BackgroundColor<<infrastructure>> LightCoral
+}
+
+package "Presentation Layer" <<presentation>> {
+    [Angular 20 Frontend\n(Siemens Element UI)] as Frontend
+    
+    package "Angular Modules" {
+        [Auth Module] as AuthModule
+        [Products Module] as ProductsModule
+        [Cart Module] as CartModule
+        [Orders Module] as OrdersModule
+        [Payment Module] as PaymentModule
+    }
+    
+    package "Angular Services" {
+        [HTTP Interceptor] as Interceptor
+        [Auth Service] as AuthService
+        [Product Service] as ProductService
+        [Cart Service] as CartService
+        [Order Service] as OrderService
+    }
+    
+    package "Angular Guards" {
+        [Auth Guard] as AuthGuard
+    }
+}
+
+package "API Layer (ASP.NET Core 8)" <<presentation>> {
+    [API Gateway\n(Controllers)] as APIGateway
+    
+    package "Controllers" {
+        [Auth Controller] as AuthController
+        [Products Controller] as ProductsController
+        [Cart Controller] as CartController
+        [Orders Controller] as OrdersController
+        [Payment Controller] as PaymentController
+    }
+    
+    package "Middleware" {
+        [JWT Authentication] as JWTAuth
+        [Exception Handler] as ExceptionHandler
+        [Request Validation] as Validation
+    }
+}
+
+package "Application Layer (Business Logic)" <<business>> {
+    package "Services" {
+        [User Service] as UserService
+        [Product Service (Backend)] as ProductServiceBackend
+        [Cart Service (Backend)] as CartServiceBackend
+        [Order Service (Backend)] as OrderServiceBackend
+        [Payment Service] as PaymentServiceBackend
+    }
+    
+    package "DTOs & Validators" {
+        [Request/Response DTOs] as DTOs
+        [Business Validators] as BusinessValidators
+    }
+    
+    package "Interfaces" {
+        [IUserService] as IUserService
+        [IProductService] as IProductService
+        [ICartService] as ICartService
+        [IOrderService] as IOrderService
+        [IPaymentService] as IPaymentService
+    }
+}
+
+package "Domain Layer (Core)" <<business>> {
+    package "Entities" {
+        [User] as UserEntity
+        [Product] as ProductEntity
+        [Category] as CategoryEntity
+        [Cart] as CartEntity
+        [CartItem] as CartItemEntity
+        [Order] as OrderEntity
+        [OrderItem] as OrderItemEntity
+        [Payment] as PaymentEntity
+    }
+    
+    package "Repository Interfaces" {
+        [IRepository<T>] as IRepository
+        [IUserRepository] as IUserRepository
+        [IProductRepository] as IProductRepository
+        [IOrderRepository] as IOrderRepository
+    }
+}
+
+package "Infrastructure Layer (Data Access)" <<infrastructure>> {
+    package "Data Context" {
+        [QuickMart DbContext\n(Entity Framework Core)] as DbContext
+    }
+    
+    package "Repositories" {
+        [Generic Repository] as GenericRepository
+        [User Repository] as UserRepository
+        [Product Repository] as ProductRepository
+        [Order Repository] as OrderRepository
+    }
+    
+    package "External Services" {
+        [JWT Token Generator] as JWTGenerator
+        [Password Hasher] as PasswordHasher
+    }
+}
+
+database "SQLite Database" {
+    [Users Table] as UsersTable
+    [Products Table] as ProductsTable
+    [Categories Table] as CategoriesTable
+    [Carts Table] as CartsTable
+    [Orders Table] as OrdersTable
+    [Payments Table] as PaymentsTable
+}
+
+' Frontend to API connections
+Frontend --> APIGateway : HTTP/HTTPS (RESTful API)
+AuthModule --> AuthService
+ProductsModule --> ProductService
+CartModule --> CartService
+OrdersModule --> OrderService
+PaymentModule --> OrderService
+
+AuthService --> Interceptor
+ProductService --> Interceptor
+CartService --> Interceptor
+OrderService --> Interceptor
+
+Interceptor --> AuthController : POST /api/auth/login
+Interceptor --> AuthController : POST /api/auth/register
+Interceptor --> ProductsController : GET /api/products
+Interceptor --> CartController : POST /api/cart
+Interceptor --> OrdersController : GET /api/orders
+Interceptor --> PaymentController : POST /api/payment
+
+AuthGuard --> AuthService
+
+' API Layer connections
+APIGateway --> JWTAuth
+APIGateway --> ExceptionHandler
+APIGateway --> Validation
+
+AuthController --> IUserService
+ProductsController --> IProductService
+CartController --> ICartService
+OrdersController --> IOrderService
+PaymentController --> IPaymentService
+
+' Application Layer connections
+IUserService <|.. UserService
+IProductService <|.. ProductServiceBackend
+ICartService <|.. CartServiceBackend
+IOrderService <|.. OrderServiceBackend
+IPaymentService <|.. PaymentServiceBackend
+
+UserService --> IUserRepository
+ProductServiceBackend --> IProductRepository
+OrderServiceBackend --> IOrderRepository
+CartServiceBackend --> IRepository
+
+UserService --> DTOs
+UserService --> BusinessValidators
+
+' Domain to Infrastructure connections
+IUserRepository <|.. UserRepository
+IProductRepository <|.. ProductRepository
+IOrderRepository <|.. OrderRepository
+IRepository <|.. GenericRepository
+
+UserRepository --> DbContext
+ProductRepository --> DbContext
+OrderRepository --> DbContext
+
+UserService --> JWTGenerator
+UserService --> PasswordHasher
+
+' Infrastructure to Database
+DbContext --> UsersTable
+DbContext --> ProductsTable
+DbContext --> CategoriesTable
+DbContext --> CartsTable
+DbContext --> OrdersTable
+DbContext --> PaymentsTable
+
+note right of Frontend
+  **Responsibilities:**
+  - User Interface rendering
+  - Client-side validation
+  - State management
+  - Routing & Navigation
+  - API communication
+end note
+
+note right of APIGateway
+  **Responsibilities:**
+  - Request routing
+  - Authentication/Authorization
+  - Input validation
+  - Response formatting
+  - Error handling
+end note
+
+note right of UserService
+  **Responsibilities:**
+  - Business logic implementation
+  - Data validation
+  - Business rules enforcement
+  - Orchestration of operations
+  - DTO mapping
+end note
+
+note right of DbContext
+  **Responsibilities:**
+  - Data persistence
+  - Database operations (CRUD)
+  - Transaction management
+  - Query optimization
+  - External integrations
+end note
+
+@enduml

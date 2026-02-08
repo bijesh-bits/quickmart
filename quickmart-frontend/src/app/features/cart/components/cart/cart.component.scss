@@ -1,0 +1,141 @@
+:host {
+  display: block;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.cart-container {
+  max-width: 1300px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.cart-header {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #343a40;
+  margin-bottom: 2rem;
+}
+
+.cart-item-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.product-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.item-details {
+  flex-grow: 1;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0 0 0.5rem 0;
+}
+
+.stock-status {
+  font-size: 0.9rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  &.in-stock {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  &.out-of-stock {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.unit-price {
+  font-weight: 600;
+  color: #495057;
+  width: 100px;
+  text-align: center;
+}
+
+.subtotal {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #212529;
+  width: 120px;
+  text-align: right;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 2rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  color: #495057;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #212529;
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.empty-cart-message {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+  .pi {
+    font-size: 3rem;
+    color: #6c757d;
+  }
+
+  h2 {
+    margin-top: 1.5rem;
+    font-size: 1.75rem;
+    color: #343a40;
+  }
+
+  p {
+    color: #6c757d;
+    margin-bottom: 2rem;
+  }
+}
+
+::ng-deep .p-inputnumber {
+  width: 120px;
+  .p-inputtext {
+    text-align: center;
+  }
+}

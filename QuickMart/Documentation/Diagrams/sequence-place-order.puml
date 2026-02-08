@@ -1,0 +1,93 @@
+@startuml QuickMart_Sequence_PlaceOrder
+
+actor User
+participant "Cart Component" as CartComp
+participant "Payment Component" as PaymentComp
+participant "Cart Service" as CartService
+participant "Order Service" as OrderService
+participant "Orders Controller" as OrderController
+participant "Order Service (Backend)" as OrderServiceBackend
+participant "Payment Service" as PaymentService
+participant "Order Repository" as OrderRepo
+database "SQLite DB" as DB
+
+User -> CartComp : Click "Proceed to Checkout"
+activate CartComp
+
+CartComp -> CartService : getCartItems()
+activate CartService
+CartService --> CartComp : Cart items with total
+deactivate CartService
+
+CartComp -> PaymentComp : Navigate with cart data
+deactivate CartComp
+activate PaymentComp
+
+User -> PaymentComp : Enter shipping address
+
+User -> PaymentComp : Enter payment details\n(card number, CVV, expiry)
+
+PaymentComp -> PaymentComp : Validate payment form\n(client-side)
+
+PaymentComp -> OrderService : createOrder(orderDto)
+activate OrderService
+
+OrderService -> OrderController : POST /api/orders
+activate OrderController
+
+OrderController -> OrderServiceBackend : CreateOrderAsync(orderDto)
+activate OrderServiceBackend
+
+OrderServiceBackend -> OrderServiceBackend : Validate stock availability
+
+OrderServiceBackend -> OrderServiceBackend : Calculate totals\n(amount, discount, tax)
+
+OrderServiceBackend -> OrderRepo : CreateOrderAsync(order)
+activate OrderRepo
+OrderRepo -> DB : BEGIN TRANSACTION
+OrderRepo -> DB : INSERT INTO Orders\n(UserId, OrderNumber, TotalAmount...)
+DB --> OrderRepo : Order created
+
+OrderRepo -> DB : INSERT INTO OrderItems\n(OrderId, ProductId, Quantity...)
+DB --> OrderRepo : Order items created
+deactivate OrderRepo
+
+OrderServiceBackend -> PaymentService : ProcessPaymentAsync(paymentDto)
+activate PaymentService
+
+PaymentService -> PaymentService : Mock payment processing\n(simulate gateway)
+
+PaymentService -> PaymentService : Generate transaction ID
+
+PaymentService -> DB : INSERT INTO Payments\n(OrderId, TransactionId, Amount...)
+DB --> PaymentService : Payment recorded
+
+PaymentService --> OrderServiceBackend : PaymentResponseDto\n(status: Completed)
+deactivate PaymentService
+
+OrderServiceBackend -> DB : UPDATE Orders\nSET Status = 'Processing'
+DB --> OrderServiceBackend : Order updated
+
+OrderServiceBackend -> DB : UPDATE Products\nSET StockQuantity = StockQuantity - ?
+DB --> OrderServiceBackend : Stock updated
+
+OrderServiceBackend -> DB : DELETE FROM CartItems\nWHERE CartId = ?
+DB --> OrderServiceBackend : Cart cleared
+
+OrderServiceBackend -> DB : COMMIT TRANSACTION
+
+OrderServiceBackend --> OrderController : OrderResponseDto
+deactivate OrderServiceBackend
+
+OrderController --> OrderService : 201 Created\n{orderId, orderNumber}
+deactivate OrderController
+
+OrderService --> PaymentComp : Order created successfully
+deactivate OrderService
+
+PaymentComp -> PaymentComp : Navigate to\nOrder Confirmation
+
+PaymentComp --> User : Order placed successfully!\nOrder #: ORD-20260207-0001
+deactivate PaymentComp
+
+@enduml

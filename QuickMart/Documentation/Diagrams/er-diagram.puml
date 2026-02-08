@@ -1,0 +1,172 @@
+@startuml QuickMart_ER_Diagram
+
+' Styling
+skinparam linetype ortho
+skinparam class {
+    BackgroundColor LightYellow
+    BorderColor Black
+    ArrowColor Black
+}
+
+' Entities
+entity "User" as user {
+    * **UserId** : INT <<PK>>
+    --
+    * Email : VARCHAR(255) <<UNIQUE>>
+    * PasswordHash : VARCHAR(500)
+    * FirstName : VARCHAR(100)
+    * LastName : VARCHAR(100)
+    * PhoneNumber : VARCHAR(20)
+    * CreatedAt : DATETIME
+    * UpdatedAt : DATETIME
+    * IsActive : BOOLEAN
+    * Role : VARCHAR(50) [Customer/Admin]
+}
+
+entity "Category" as category {
+    * **CategoryId** : INT <<PK>>
+    --
+    * CategoryName : VARCHAR(100) <<UNIQUE>>
+    * Description : TEXT
+    * ImageUrl : VARCHAR(500)
+    * IsActive : BOOLEAN
+    * DisplayOrder : INT
+    * CreatedAt : DATETIME
+}
+
+entity "Product" as product {
+    * **ProductId** : INT <<PK>>
+    --
+    * CategoryId : INT <<FK>>
+    * ProductName : VARCHAR(200)
+    * Description : TEXT
+    * Price : DECIMAL(10,2)
+    * DiscountPrice : DECIMAL(10,2)
+    * StockQuantity : INT
+    * Unit : VARCHAR(50) [kg/ltr/pcs]
+    * ImageUrl : VARCHAR(500)
+    * Brand : VARCHAR(100)
+    * IsActive : BOOLEAN
+    * IsFeatured : BOOLEAN
+    * CreatedAt : DATETIME
+    * UpdatedAt : DATETIME
+}
+
+entity "Cart" as cart {
+    * **CartId** : INT <<PK>>
+    --
+    * UserId : INT <<FK>>
+    * CreatedAt : DATETIME
+    * UpdatedAt : DATETIME
+}
+
+entity "CartItem" as cartitem {
+    * **CartItemId** : INT <<PK>>
+    --
+    * CartId : INT <<FK>>
+    * ProductId : INT <<FK>>
+    * Quantity : INT
+    * PriceAtAdd : DECIMAL(10,2)
+    * AddedAt : DATETIME
+}
+
+entity "Order" as order {
+    * **OrderId** : INT <<PK>>
+    --
+    * UserId : INT <<FK>>
+    * OrderNumber : VARCHAR(50) <<UNIQUE>>
+    * OrderDate : DATETIME
+    * TotalAmount : DECIMAL(10,2)
+    * DiscountAmount : DECIMAL(10,2)
+    * TaxAmount : DECIMAL(10,2)
+    * FinalAmount : DECIMAL(10,2)
+    * Status : VARCHAR(50) [Pending/Processing/Shipped/Delivered/Cancelled]
+    * ShippingAddress : TEXT
+    * ShippingCity : VARCHAR(100)
+    * ShippingZipCode : VARCHAR(20)
+    * CreatedAt : DATETIME
+    * UpdatedAt : DATETIME
+}
+
+entity "OrderItem" as orderitem {
+    * **OrderItemId** : INT <<PK>>
+    --
+    * OrderId : INT <<FK>>
+    * ProductId : INT <<FK>>
+    * ProductName : VARCHAR(200)
+    * Quantity : INT
+    * UnitPrice : DECIMAL(10,2)
+    * DiscountPrice : DECIMAL(10,2)
+    * TotalPrice : DECIMAL(10,2)
+}
+
+entity "Payment" as payment {
+    * **PaymentId** : INT <<PK>>
+    --
+    * OrderId : INT <<FK>>
+    * PaymentMethod : VARCHAR(50) [CreditCard/DebitCard/UPI/Cash]
+    * TransactionId : VARCHAR(100) <<UNIQUE>>
+    * PaymentStatus : VARCHAR(50) [Pending/Completed/Failed/Refunded]
+    * Amount : DECIMAL(10,2)
+    * PaymentDate : DATETIME
+    * CardLastFourDigits : VARCHAR(4)
+    * CardType : VARCHAR(50)
+    * CreatedAt : DATETIME
+}
+
+' Relationships
+user ||--o{ cart : "has"
+user ||--o{ order : "places"
+
+category ||--o{ product : "contains"
+
+cart ||--o{ cartitem : "contains"
+product ||--o{ cartitem : "added to"
+
+order ||--o{ orderitem : "contains"
+product ||--o{ orderitem : "part of"
+
+order ||--|| payment : "paid via"
+
+note top of user
+  **Constraints:**
+  - Email must be unique
+  - Password must be hashed (BCrypt)
+  - Role defaults to 'Customer'
+  - PhoneNumber format validation
+end note
+
+note top of product
+  **Constraints:**
+  - Price must be > 0
+  - DiscountPrice <= Price
+  - StockQuantity >= 0
+  - Category must exist
+  - ProductName unique per category
+end note
+
+note top of order
+  **Constraints:**
+  - OrderNumber auto-generated (ORD-YYYYMMDD-XXXX)
+  - FinalAmount = TotalAmount - DiscountAmount + TaxAmount
+  - Status follows state machine
+  - User must exist
+end note
+
+note top of payment
+  **Constraints:**
+  - TransactionId must be unique
+  - Amount must match Order.FinalAmount
+  - One payment per order (in this version)
+  - PaymentStatus state transitions
+end note
+
+note top of cartitem
+  **Constraints:**
+  - Quantity must be > 0
+  - Product must be in stock
+  - Unique (CartId, ProductId) combination
+  - PriceAtAdd captures price snapshot
+end note
+
+@enduml

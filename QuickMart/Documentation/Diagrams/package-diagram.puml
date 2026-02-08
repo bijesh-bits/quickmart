@@ -1,0 +1,304 @@
+@startuml QuickMart_Package_Diagram
+
+!define RECTANGLE package
+
+skinparam packageStyle rectangle
+skinparam package {
+    BackgroundColor<<frontend>> LightBlue
+    BackgroundColor<<api>> LightGreen
+    BackgroundColor<<application>> LightYellow
+    BackgroundColor<<domain>> Wheat
+    BackgroundColor<<infrastructure>> LightCoral
+    BorderColor Black
+    FontSize 12
+}
+
+package "QuickMart.Frontend (Angular 20)" <<frontend>> {
+    package "src/app/modules" {
+        package "auth" {
+            [login.component]
+            [register.component]
+        }
+        
+        package "products" {
+            [product-list.component]
+            [product-detail.component]
+            [product-search.component]
+        }
+        
+        package "cart" {
+            [cart.component]
+            [cart-item.component]
+        }
+        
+        package "orders" {
+            [orders-list.component]
+            [order-detail.component]
+        }
+        
+        package "payment" {
+            [payment.component]
+            [payment-form.component]
+        }
+    }
+    
+    package "src/app/core" {
+        package "services" {
+            [auth.service]
+            [product.service]
+            [cart.service]
+            [order.service]
+            [payment.service]
+        }
+        
+        package "guards" {
+            [auth.guard]
+        }
+        
+        package "interceptors" {
+            [jwt.interceptor]
+            [error.interceptor]
+        }
+    }
+    
+    package "src/app/shared" {
+        package "models" {
+            [user.model]
+            [product.model]
+            [cart.model]
+            [order.model]
+        }
+        
+        package "components" {
+            [header.component]
+            [footer.component]
+            [loader.component]
+        }
+    }
+}
+
+package "QuickMart.API (ASP.NET Core 8)" <<api>> {
+    package "Controllers" {
+        [AuthController]
+        [ProductsController]
+        [CartController]
+        [OrdersController]
+        [PaymentController]
+    }
+    
+    package "Middleware" {
+        [JwtMiddleware]
+        [ExceptionHandlerMiddleware]
+        [ValidationMiddleware]
+    }
+    
+    package "Filters" {
+        [AuthorizationFilter]
+        [ValidationFilter]
+    }
+}
+
+package "QuickMart.Application (Business Logic)" <<application>> {
+    package "Services" {
+        [UserService]
+        [ProductService]
+        [CartService]
+        [OrderService]
+        [PaymentService]
+    }
+    
+    package "Interfaces" {
+        [IUserService]
+        [IProductService]
+        [ICartService]
+        [IOrderService]
+        [IPaymentService]
+    }
+    
+    package "DTOs" {
+        package "Requests" {
+            [LoginRequestDto]
+            [RegisterRequestDto]
+            [CreateOrderDto]
+            [PaymentRequestDto]
+        }
+        
+        package "Responses" {
+            [AuthResponseDto]
+            [ProductResponseDto]
+            [OrderResponseDto]
+            [PaymentResponseDto]
+        }
+    }
+    
+    package "Validators" {
+        [UserValidator]
+        [ProductValidator]
+        [OrderValidator]
+        [PaymentValidator]
+    }
+}
+
+package "QuickMart.Core (Domain)" <<domain>> {
+    package "Entities" {
+        [User]
+        [Category]
+        [Product]
+        [Cart]
+        [CartItem]
+        [Order]
+        [OrderItem]
+        [Payment]
+    }
+    
+    package "Interfaces/Repositories" {
+        [IRepository<T>]
+        [IUserRepository]
+        [IProductRepository]
+        [ICartRepository]
+        [IOrderRepository]
+    }
+    
+    package "Enums" {
+        [OrderStatus]
+        [PaymentStatus]
+        [PaymentMethod]
+        [UserRole]
+    }
+}
+
+package "QuickMart.Infrastructure (Data & External)" <<infrastructure>> {
+    package "Data" {
+        [QuickMartDbContext]
+        
+        package "Configurations" {
+            [UserConfiguration]
+            [ProductConfiguration]
+            [OrderConfiguration]
+        }
+    }
+    
+    package "Repositories" {
+        [GenericRepository<T>]
+        [UserRepository]
+        [ProductRepository]
+        [CartRepository]
+        [OrderRepository]
+    }
+    
+    package "Services" {
+        [JwtTokenGenerator]
+        [PasswordHasher]
+    }
+    
+    package "Migrations" {
+        [InitialCreate]
+        [SeedData]
+    }
+}
+
+' Dependencies - Frontend
+[login.component] --> [auth.service]
+[product-list.component] --> [product.service]
+[cart.component] --> [cart.service]
+[orders-list.component] --> [order.service]
+[payment.component] --> [payment.service]
+
+[auth.service] --> [jwt.interceptor]
+[product.service] --> [jwt.interceptor]
+
+[auth.guard] --> [auth.service]
+
+' Dependencies - API Layer
+[AuthController] --> [IUserService]
+[ProductsController] --> [IProductService]
+[CartController] --> [ICartService]
+[OrdersController] --> [IOrderService]
+[PaymentController] --> [IPaymentService]
+
+[JwtMiddleware] --> [IUserService]
+
+' Dependencies - Application Layer
+[UserService] ..|> [IUserService]
+[ProductService] ..|> [IProductService]
+[CartService] ..|> [ICartService]
+[OrderService] ..|> [IOrderService]
+[PaymentService] ..|> [IPaymentService]
+
+[UserService] --> [IUserRepository]
+[ProductService] --> [IProductRepository]
+[CartService] --> [ICartRepository]
+[OrderService] --> [IOrderRepository]
+
+[UserService] --> [LoginRequestDto]
+[UserService] --> [AuthResponseDto]
+
+' Dependencies - Infrastructure Layer
+[UserRepository] ..|> [IUserRepository]
+[ProductRepository] ..|> [IProductRepository]
+[CartRepository] ..|> [ICartRepository]
+[OrderRepository] ..|> [IOrderRepository]
+
+[UserRepository] --> [QuickMartDbContext]
+[ProductRepository] --> [QuickMartDbContext]
+[CartRepository] --> [QuickMartDbContext]
+[OrderRepository] --> [QuickMartDbContext]
+
+[QuickMartDbContext] --> [User]
+[QuickMartDbContext] --> [Product]
+[QuickMartDbContext] --> [Order]
+
+[UserService] --> [JwtTokenGenerator]
+[UserService] --> [PasswordHasher]
+
+note right of "QuickMart.Frontend (Angular 20)"
+  **Responsibilities:**
+  - User interface rendering with Siemens Element components
+  - Client-side routing and navigation
+  - Form validation and user input handling
+  - State management for cart and user session
+  - HTTP API communication
+  - Authentication token management
+end note
+
+note right of "QuickMart.API (ASP.NET Core 8)"
+  **Responsibilities:**
+  - RESTful API endpoints
+  - Request/Response handling
+  - JWT authentication and authorization
+  - Input validation and sanitization
+  - Exception handling and error responses
+  - API versioning and documentation (Swagger)
+end note
+
+note right of "QuickMart.Application (Business Logic)"
+  **Responsibilities:**
+  - Business logic implementation
+  - Business rule validation
+  - DTO mapping (Entity ↔ DTO)
+  - Service orchestration
+  - Transaction coordination
+  - Business exceptions handling
+end note
+
+note right of "QuickMart.Core (Domain)"
+  **Responsibilities:**
+  - Domain model definition
+  - Business entities
+  - Repository contracts/interfaces
+  - Domain-driven design patterns
+  - Business invariants and rules
+  - No external dependencies
+end note
+
+note right of "QuickMart.Infrastructure (Data & External)"
+  **Responsibilities:**
+  - Database access via EF Core
+  - Repository implementations
+  - Database migrations
+  - External service integrations
+  - Caching mechanisms
+  - File storage operations
+end note
+
+@enduml

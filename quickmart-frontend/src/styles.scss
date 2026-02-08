@@ -1,0 +1,144 @@
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f5f7fa;
+  color: #495057;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+app-root {
+  display: block;
+  min-height: 100vh;
+}
+
+/* PrimeNG Theme Customization */
+::ng-deep {
+  .p-button {
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+  }
+  
+  .p-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  
+  .p-inputtext,
+  .p-dropdown {
+    border-radius: 8px;
+  }
+  
+  .p-datatable {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* Confirmation Dialog */
+  .p-confirm-dialog {
+    .p-dialog-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+      font-weight: 600;
+    }
+    .p-dialog-content {
+      padding: 1.5rem;
+    }
+    .p-dialog-footer {
+      border-top: 1px solid #dee2e6;
+      padding: 1rem;
+      gap: 0.5rem;
+    }
+  }
+
+  /* Menu */
+  .p-menu {
+    border-radius: 8px;
+  }
+
+}
+
+/* Custom Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+.my-2 { margin-top: 1rem; margin-bottom: 1rem; }
+.my-3 { margin-top: 1.5rem; margin-bottom: 1.5rem; }
+.my-4 { margin-top: 2rem; margin-bottom: 2rem; }
+
+.p-1 { padding: 0.5rem; }
+.p-2 { padding: 1rem; }
+.p-3 { padding: 1.5rem; }
+.p-4 { padding: 2rem; }
+
+/* Price Styling */
+.price {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2196F3;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #9E9E9E;
+  font-size: 1.1rem;
+  margin-left: 0.5rem;
+}
+
+.discount-badge {
+  background-color: #4CAF50;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+}
+
+/* Stock Status */
+.in-stock {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.out-of-stock {
+  color: #f44336;
+  font-weight: 500;
+}
+
+.low-stock {
+  color: #ff9800;
+  font-weight: 500;
+}
+  .profile-menu-item{
+    background-color :#9b9999 !important;
+  }

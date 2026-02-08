@@ -1,0 +1,86 @@
+.navbar-container {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.brand-section {
+  margin-right: 3rem;
+  padding-right: 3rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  
+  i {
+    font-size: 2.5rem;
+    color: white;
+    margin-right: 0.75rem;
+  }
+  
+  .brand-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.5px;
+  }
+}
+
+::ng-deep .p-menubar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 0;
+  padding: 1rem 2rem;
+  
+  .p-menubar-root-list {
+    gap: 0.5rem;
+    margin-left: 0;
+  }
+  
+  .p-menuitem {
+    position: relative;
+  }
+  
+  .p-menuitem-link {
+    color: white !important;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem !important;
+    transition: background-color 0.3s;
+    
+    &:hover {
+      background: rgba(0, 0, 0, 0.2) !important;
+    }
+  }
+  
+  .p-menuitem-icon {
+    color: white !important;
+    margin-right: 0.5rem;
+  }
+  
+  .p-menuitem-text {
+    color: white !important;
+  }
+}
+
+::ng-deep .cart-menu-item .p-menuitem-link {
+  padding-right: 2.5rem !important; // Add extra padding to make space for the badge
+}
+
+::ng-deep .cart-badge {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  background-color: #ffc107;
+  color: #000;
+  border-radius: 50%;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+

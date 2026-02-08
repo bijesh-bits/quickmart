@@ -1,0 +1,108 @@
+<div class="checkout-container">
+  <div class="checkout-header">
+    <h1>Checkout</h1>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Loading your cart...</p>
+  </div>
+
+  <div *ngIf="!loading && (!cart || cart.items.length === 0)" class="empty-cart-message">
+    <i class="pi pi-shopping-cart"></i>
+    <h2>Your Cart is Empty</h2>
+    <p>Looks like you haven't added anything to your cart yet.</p>
+    <button pButton type="button" label="Continue Shopping" icon="pi pi-arrow-left" routerLink="/"></button>
+  </div>
+
+  <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+    <div class="grid" *ngIf="!loading && cart && cart.items.length > 0">
+      <!-- Left Side: Form -->
+      <div class="col-12 lg:col-7">
+        <!-- Shipping Address -->
+        <div class="checkout-card">
+          <h3 class="mb-4 font-semibold">Shipping Address</h3>
+          <div class="p-fluid">
+            <div class="field">
+              <label for="address">Address</label>
+              <textarea id="address" pInputTextarea formControlName="shippingAddress" rows="3" placeholder="123 Main St, Apt 4B"></textarea>
+              <small *ngIf="f['shippingAddress'].invalid && f['shippingAddress'].touched" class="p-error">Address is required.</small>
+            </div>
+            <div class="formgrid grid">
+              <div class="field col-12 md:col-8">
+                <label for="city">City</label>
+                <input id="city" type="text" pInputText formControlName="city" placeholder="New York">
+                <small *ngIf="f['city'].invalid && f['city'].touched" class="p-error">City is required.</small>
+              </div>
+              <div class="field col-12 md:col-4">
+                <label for="zipCode">ZIP Code</label>
+                <input id="zipCode" type="text" pInputText formControlName="zipCode" placeholder="10001">
+                <small *ngIf="f['zipCode'].invalid && f['zipCode'].touched" class="p-error">Valid ZIP is required.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="checkout-card">
+          <h3 class="mb-4 font-semibold">Payment Method</h3>
+          <div class="p-fluid">
+            <div class="field">
+              <label for="paymentMethod">Select Payment Method</label>
+              <p-dropdown id="paymentMethod" [options]="paymentMethods" formControlName="paymentMethod" optionLabel="label" optionValue="value" placeholder="Choose a payment option"></p-dropdown>
+            </div>
+
+            <div *ngIf="isCardPayment()" class="mt-4">
+              <div class="field">
+                <label for="cardHolderName">Cardholder Name</label>
+                <input id="cardHolderName" type="text" pInputText formControlName="cardHolderName" placeholder="John M. Doe">
+                <small *ngIf="f['cardHolderName'].invalid && f['cardHolderName'].touched" class="p-error">Cardholder name is required.</small>
+              </div>
+              <div class="field">
+                <label for="cardNumber">Card Number</label>
+                <p-inputMask id="cardNumber" mask="9999-9999-9999-9999" formControlName="cardNumber" placeholder="****-****-****-****"></p-inputMask>
+                <small *ngIf="f['cardNumber'].invalid && f['cardNumber'].touched" class="p-error">A valid card number is required.</small>
+              </div>
+              <div class="formgrid grid">
+                <div class="field col-6">
+                  <label for="expiryDate">Expiry Date</label>
+                  <p-inputMask id="expiryDate" mask="99/99" formControlName="expiryDate" placeholder="MM/YY"></p-inputMask>
+                  <small *ngIf="f['expiryDate'].invalid && f['expiryDate'].touched" class="p-error">Valid expiry date is required.</small>
+                </div>
+                <div class="field col-6">
+                  <label for="cvv">CVV</label>
+                  <p-inputMask id="cvv" mask="999" formControlName="cvv" placeholder="***"></p-inputMask>
+                  <small *ngIf="f['cvv'].invalid && f['cvv'].touched" class="p-error">Valid CVV is required.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Order Summary -->
+      <div class="col-12 lg:col-5">
+        <div class="summary-card">
+          <h3 class="mb-4 font-semibold">Order Summary</h3>
+          <div class="summary-item">
+            <span>Subtotal</span>
+            <span>{{ cart.totalPrice | currency:'INR' }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Shipping</span>
+            <span>FREE</span>
+          </div>
+          <div class="summary-item">
+            <span>Taxes</span>
+            <span>Calculated at next step</span>
+          </div>
+          <div class="summary-total">
+            <span>Total</span>
+            <span>{{ cart.totalPrice | currency:'INR' }}</span>
+          </div>
+          <p-button type="submit" label="Place Order" icon="pi pi-check" styleClass="w-full mt-4 p-button-lg" [loading]="submitting" [disabled]="checkoutForm.invalid"></p-button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
